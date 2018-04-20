@@ -108,7 +108,7 @@ class RedditFS(fuse.Operations):
 
     def _populate_subreddit(self, subreddit):
         r = requests.get(
-            'http://api.reddit.com/r/{}/hot'.format(subreddit),
+            'https://api.reddit.com/r/{}/hot'.format(subreddit),
             headers={
                 'User-Agent': 'redditfs /u/evilyomiel'
             },
