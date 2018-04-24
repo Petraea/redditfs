@@ -156,7 +156,7 @@ class RedditFS(fuse.Operations):
         filename = self._sanitize_path(title)
 
         permalink = urlparse.urljoin(
-            'http://www.reddit.com/',
+            'https://www.reddit.com/',
             zelda['permalink']
         )
         url = zelda['url']
