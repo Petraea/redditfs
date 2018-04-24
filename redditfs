@@ -1,0 +1,62 @@
+#!/bin/bash
+REQS='reqs.txt'
+
+which which &>/dev/null
+if [ $? -ne 0 ] ; then
+  echo "You don't have which. I can't really go further..."
+  exit 1
+fi
+for prog in python virtualenv ; do
+  which $prog &>/dev/null
+  if [ $? -ne 0 ] ; then
+    echo "You don't have $prog installed. Please remedy this."
+    exit 1
+  fi
+done
+
+if ! [ -d venv ] ; then
+  echo "Creating a new virtualenv in venv ..."
+  virtualenv venv
+  if [ $? -ne 0 ] ; then
+    echo "Something failed whilst building the virtualenv!"
+    exit 1
+  fi
+fi
+
+contains() {
+    [[ $1 =~ (^|[[:space:]])"$2"($|[[:space:]]) ]] && return 0 || return 1
+}
+
+pipcheck() {
+pipdata=$(pip freeze)
+while read l ; do
+  if ! contains "$pipdata" $l ; then
+    return 1
+  fi
+done <"$REQS"
+}
+
+source venv/bin/activate
+if ! pipcheck ; then
+  echo "Installing requirements ..."
+  pip install -r "$REQS"
+fi
+if ! pipcheck ; then
+  echo "Requirements installation failed"
+  exit 1
+fi
+
+if [ "z$REDDIT_MOUNT" == "z" ] ; then
+    REDDIT_MOUNT='r'
+fi
+if ! [ -d "$REDDIT_MOUNT" ] ; then
+  echo "Creating a new mountpoint $REDDIT_MOUNT ..."
+  mkdir "$REDDIT_MOUNT"
+  if ! [ -d "$REDDIT_MOUNT" ] ; then
+    echo "I can't create this mount point. Check the permissions."
+    exit 1
+  fi
+fi
+
+echo "Mounting reddit to $REDDIT_MOUNT ..."
+python redditfs.py $REDDIT_MOUNT
