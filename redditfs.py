@@ -30,6 +30,7 @@ class RedditFS(fuse.Operations):
             RedditFS.PERMS | RedditFS.DIR_PERMS,
             time.time(),
         )
+        self._populate_popular_subreddits()
 
     @property
     def dirlist(self):
@@ -106,6 +107,22 @@ class RedditFS(fuse.Operations):
 
         # The directory exists and is fresh, return it
         return node
+
+    def _populate_popular_subreddits(self):
+        r = requests.get(
+            'https://api.reddit.com/subreddits/popular',
+            headers={
+                'User-Agent': 'redditfs v2'
+            },
+            allow_redirects=False,
+        )
+        if r.status_code in [404, 302]:
+            return
+        r.raise_for_status()
+
+        for link in r.json()['data']['children']:
+            subreddit = link['data']['url'].split('/')[2]
+            self._populate_subreddit(subreddit.lower())
 
     def _populate_subreddit(self, subreddit):
         r = requests.get(
