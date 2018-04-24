@@ -6,6 +6,7 @@ import sys
 import requests
 import os
 import os.path
+import unicodedata
 from fsfile import *
 
 try:
@@ -177,14 +178,8 @@ class RedditFS(fuse.Operations):
         fs.add_child(root_file)
 
     def _sanitize_path(self, path):
-        replace = (
-            ('/', ''),
-            (' ', '_'),
-            ("'", ''),
-            ('"', ''),
-        )
-        for r in replace:
-            path = path.replace(*r)
+        path = unicodedata.normalize('NFKD',path)
+        path = path.replace('/', '')
         return path.lower()
 
 
