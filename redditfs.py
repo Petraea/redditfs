@@ -172,21 +172,21 @@ class RedditFS(fuse.Operations):
         permalink_file = FSFile(
             filename='permalink',
             mode=RedditFS.PERMS,
-            content=permalink,
+            content=permalink+'\n',
             ctime=zelda['created_utc'],
         )
 
         url_file = FSFile(
             filename='url',
             mode=RedditFS.PERMS,
-            content=url,
+            content=url+'\n',
             ctime=zelda['created_utc'],
         )
 
         selftext_file = FSFile(
             filename='selftext',
             mode=RedditFS.PERMS,
-            content=selftext,
+            content=selftext+'\n',
             ctime=zelda['created_utc'],
         )
 
